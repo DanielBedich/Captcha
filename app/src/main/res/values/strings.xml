@@ -6,4 +6,8 @@
     <string name="statusStopButton">Stop Captcha</string>
     <string name="settingsButton">Settings</string>
     <string name="statusToast">Running Status Changed</string>
+    <string name="email">Password</string>
+    <string name="password">Password</string>
+    <string name="passwordConfirm">Password</string>
+    <string name="submit">Submit</string>
 </resources>

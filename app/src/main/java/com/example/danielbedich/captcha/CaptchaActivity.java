@@ -39,7 +39,7 @@ public class CaptchaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_captcha);
 
         Boolean settingsFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
-                .getBoolean("settingsFirstRun", true);
+                .getBoolean("statusFirstRun", true);
 
         mStatusTextView = (TextView) findViewById(R.id.statusText);
         mStatusButton = (Button) findViewById(R.id.changeStatusButton);
@@ -62,7 +62,7 @@ public class CaptchaActivity extends AppCompatActivity {
 
 
         getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
-                .putBoolean("settingsFirstRun", false).commit();
+                .putBoolean("statusFirstRun", false).commit();
 
 
         mStatusButton.setOnClickListener(new View.OnClickListener() {
