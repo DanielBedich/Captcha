@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Captcha</string>
+    <string name="statusOff">Captcha is not currently running.</string>
+    <string name="statusOn">Captcha is currently running.</string>
+    <string name="statusStartButton">Start Captcha</string>
+    <string name="statusStopButton">Stop Captcha</string>
+    <string name="settingsButton">Settings</string>
+    <string name="statusToast">Running Status Changed</string>
 </resources>
