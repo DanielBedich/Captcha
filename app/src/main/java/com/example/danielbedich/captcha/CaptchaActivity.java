@@ -1,5 +1,6 @@
 package com.example.danielbedich.captcha;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -76,7 +77,7 @@ public class CaptchaActivity extends AppCompatActivity {
         mSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                startActivity(new Intent(CaptchaActivity.this, SettingsActivity.class));
             }
         });
 
