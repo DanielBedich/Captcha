@@ -1,5 +1,7 @@
 package com.example.danielbedich.captcha;
 
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -18,11 +20,40 @@ public class CaptchaActivity extends AppCompatActivity {
     private Button mSettingsButton;
     private String tag;
 
+
+    private void startLock(){
+        ComponentName cn=new ComponentName(this, AdminReceiver.class);
+        DevicePolicyManager mgr=
+                (DevicePolicyManager)getSystemService(DEVICE_POLICY_SERVICE);
+
+        if (mgr.isAdminActive(cn)) {
+            int msgId;
+
+            if (mgr.isActivePasswordSufficient()) {
+                msgId=R.string.compliant;
+            }
+            else {
+                msgId=R.string.not_compliant;
+            }
+
+            Toast.makeText(this, msgId, Toast.LENGTH_LONG).show();
+        }
+        else {
+            Intent intent=
+                    new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, cn);
+            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                    getString(R.string.device_admin_explanation));
+            startActivity(intent);
+        }
+    }
+
     private void changeRunningStatus(View v, Button b){
         Toast.makeText(this, R.string.statusToast, Toast.LENGTH_SHORT).show();
         if(mStatusButton.getText().equals(getString(R.string.statusStartButton))){
             mStatusButton.setText(R.string.statusStopButton);
             mStatusTextView.setText(R.string.statusOn);
+            startLock();
         } else {
             mStatusButton.setText(R.string.statusStartButton);
             mStatusTextView.setText(R.string.statusOff);
