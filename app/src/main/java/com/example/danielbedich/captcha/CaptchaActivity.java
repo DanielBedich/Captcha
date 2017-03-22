@@ -26,26 +26,11 @@ public class CaptchaActivity extends AppCompatActivity {
         DevicePolicyManager mgr=
                 (DevicePolicyManager)getSystemService(DEVICE_POLICY_SERVICE);
 
-        if (mgr.isAdminActive(cn)) {
-            int msgId;
+        Intent intent=new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, cn);
+        intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, getString(R.string.device_admin_explanation));
+        startActivity(intent);
 
-            if (mgr.isActivePasswordSufficient()) {
-                msgId=R.string.compliant;
-            }
-            else {
-                msgId=R.string.not_compliant;
-            }
-
-            Toast.makeText(this, msgId, Toast.LENGTH_LONG).show();
-        }
-        else {
-            Intent intent=
-                    new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, cn);
-            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                    getString(R.string.device_admin_explanation));
-            startActivity(intent);
-        }
     }
 
     private void changeRunningStatus(View v, Button b){
