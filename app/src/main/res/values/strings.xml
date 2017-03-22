@@ -13,6 +13,7 @@
     <string name="newPassword">Change Password</string>
     <string name="submit">Submit</string>
     <string name="toast">WRONG!</string>
+    <string name="alert">YOU HAVE BEEN CAUGHT BY CAPTCHA!</string>
 
     <string name="device_admin_explanation">For experimentation purposes only</string>
     <string name="compliant">Your password is compliant!</string>
