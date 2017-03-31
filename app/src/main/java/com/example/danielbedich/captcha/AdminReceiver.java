@@ -10,6 +10,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -27,14 +28,18 @@ public class AdminReceiver extends DeviceAdminReceiver {
             //Toast does not show
             //Toast.makeText(ctxt, R.string.password_failed, Toast.LENGTH_LONG).show();
             //Intent alertIntent = new Intent(ctxt, SettingsActivity.class);
-            Intent alarmIntent = new Intent("android.intent.action.MAIN");
+            /*Intent alarmIntent = new Intent("android.intent.action.MAIN");
             alarmIntent.setClass(ctxt, ToastActivity.class);
             alarmIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             alarmIntent.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
                     WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
                     WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON +
                     WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-            ctxt.startActivity(alarmIntent);
+            ctxt.startActivity(alarmIntent);*/
+
+            Intent i = new Intent(ctxt, CameraView.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            ctxt.startActivity(i);
         }
     }
 
@@ -43,4 +48,6 @@ public class AdminReceiver extends DeviceAdminReceiver {
         Toast.makeText(ctxt, R.string.password_success, Toast.LENGTH_LONG)
                 .show();
     }
+
+
 }
