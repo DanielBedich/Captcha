@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
 
     <uses-feature android:name="android.hardware.camera"/>
     <uses-feature
@@ -34,6 +36,8 @@
         <receiver
             android:name=".AdminReceiver"
             android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <uses-permission android:name="android.permission.WAKE_LOCK" />
+            <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
             <meta-data
                 android:name="android.app.device_admin"
                 android:resource="@xml/device_admin"/>
