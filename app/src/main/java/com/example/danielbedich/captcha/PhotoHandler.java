@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -16,8 +17,10 @@ import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -26,9 +29,10 @@ import android.widget.Toast;
 
 import com.example.danielbedich.captcha.AdminReceiver;
 
-public class PhotoHandler implements PictureCallback {
+public class PhotoHandler implements PictureCallback  {
 
     private final Context context;
+    GMailSender sender;
 
     public PhotoHandler(Context context) {
         this.context = context;
@@ -37,6 +41,7 @@ public class PhotoHandler implements PictureCallback {
     String mCurrentPhotoPath;
     private String ImagePath;
     private Uri URI;
+    public File pictureFile;
 
     private ImageView mImageView;
 
@@ -61,7 +66,7 @@ public class PhotoHandler implements PictureCallback {
         String filename = pictureFileDir.getPath() + File.separator + photoFile;
         System.out.println("Filename" + filename);
 
-        File pictureFile = new File(filename);
+        pictureFile = new File(filename);
 
         System.out.println(pictureFile.getAbsolutePath());
 
@@ -82,6 +87,17 @@ public class PhotoHandler implements PictureCallback {
         }
 
         addImageToGallery(pictureFile.getAbsolutePath());
+        sender = new GMailSender("captchaosu@gmail.com", "captcha4471");
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.
+                Builder().permitAll().build();
+
+        StrictMode.setThreadPolicy(policy);
+        try {
+            new MyAsyncClass().execute();
+        } catch (Exception ex) {
+            Toast.makeText(context.getApplicationContext(), ex.toString(), Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -99,5 +115,48 @@ public class PhotoHandler implements PictureCallback {
         values.put(MediaStore.MediaColumns.DATA, filePath);
 
         context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+    }
+
+    class MyAsyncClass extends AsyncTask<Void, Void, Void> {
+
+        ProgressDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            try {
+                System.out.println("HEY Do try");
+                // Add subject, Body, your mail Id, and receiver mail Id.
+                sender.sendMailAttachment("Captcha Test", "Yay it works!", "captchaosu@gmail.com", "danielbedich@gmail.com", pictureFile);
+            }
+            catch (Exception ex) {
+                System.out.println("HEY Do catch");
+            }
+            System.out.println("HEY Pre");
+            super.onPreExecute();
+            pDialog = new ProgressDialog(context);
+            pDialog.setMessage("Please wait...");
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... mApi) {
+            try {
+                System.out.println("HEY Do try");
+                // Add subject, Body, your mail Id, and receiver mail Id.
+                sender.sendMail("Captcha Test", "Yay it works!", "captchaosu@gmail.com", "dbedich@yahoo.com");
+            }
+            catch (Exception ex) {
+                System.out.println("HEY Do catch");
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            System.out.println("HEY Post");
+            super.onPostExecute(result);
+            pDialog.cancel();
+            Toast.makeText(context, "Email send", Toast.LENGTH_SHORT).show();
+        }
     }
 }

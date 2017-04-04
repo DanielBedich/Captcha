@@ -24,6 +24,7 @@ public class AdminReceiver extends DeviceAdminReceiver {
     private Camera camera;
     private int cameraId = 0;
 
+
     @Override
     public void onEnabled(Context ctxt, Intent intent) {
 
