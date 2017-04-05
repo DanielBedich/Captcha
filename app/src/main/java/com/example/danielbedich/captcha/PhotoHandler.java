@@ -12,16 +12,20 @@ import java.util.Date;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -29,14 +33,26 @@ import android.widget.Toast;
 
 import com.example.danielbedich.captcha.AdminReceiver;
 
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
+
 public class PhotoHandler implements PictureCallback  {
 
     private final Context context;
-    GMailSender sender;
-
     public PhotoHandler(Context context) {
         this.context = context;
     }
+
+    GMailSender sender;
+    private String senderEmail = "captchaosu@gmail.com";
+    private String senderPassword = "captcha4471";
+    private String userEmail;
+
+    SimpleDateFormat simpleDateFormat;
+    String format;
+
+    private String mLat;
+    private String mLong;
+    private final String emailSubject = "CAPTCHA! ALERT: POTENTIAL INTRUDER DETECTED!";
 
     String mCurrentPhotoPath;
     private String ImagePath;
@@ -47,6 +63,7 @@ public class PhotoHandler implements PictureCallback  {
 
     @Override
     public void onPictureTaken(byte[] data, Camera camera) {
+        userEmail = getDefaultSharedPreferences(context).getString("EMAIL", "Error: no email");
 
         File pictureFileDir = getDir();
 
@@ -86,8 +103,11 @@ public class PhotoHandler implements PictureCallback  {
                     Toast.LENGTH_LONG).show();
         }
 
+        simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+        format = simpleDateFormat.format(new Date());
         addImageToGallery(pictureFile.getAbsolutePath());
-        sender = new GMailSender("captchaosu@gmail.com", "captcha4471");
+        getGPSCoordinates();
+        sender = new GMailSender(senderEmail, senderPassword);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.
                 Builder().permitAll().build();
@@ -126,7 +146,7 @@ public class PhotoHandler implements PictureCallback  {
             try {
                 System.out.println("HEY Do try");
                 // Add subject, Body, your mail Id, and receiver mail Id.
-                sender.sendMailAttachment("Captcha Test", "Yay it works!", "captchaosu@gmail.com", "danielbedich@gmail.com", pictureFile);
+                sender.sendMailAttachment(emailSubject, getEmailBody(), senderEmail, userEmail, pictureFile);
             }
             catch (Exception ex) {
                 System.out.println("HEY Do catch");
@@ -158,5 +178,31 @@ public class PhotoHandler implements PictureCallback  {
             pDialog.cancel();
             Toast.makeText(context, "Email send", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void getGPSCoordinates(){
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        final Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        mLat = location.getLatitude() + "";
+        mLong = location.getLongitude() + "";
+    }
+
+    public String getEmailBody(){
+        return "CAPTCHA! has detected a potential intruder!\n" +
+                "The time of intrusion was " + format + "\n" +
+                "View their location at the following link:\n" +
+                "https://www.google.com/maps/@"+mLat+","+mLong+",13z\n" +
+                "View the attached image for who CAPTCHA! caught!";
     }
 }
