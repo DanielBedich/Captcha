@@ -4,43 +4,42 @@ package com.example.danielbedich.captcha;
  * Created by DanielBedich on 3/20/17.
  */
 
-import android.app.PendingIntent;
 import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+//Class that detects lockscreen activity, calls handler class after detection
 public class AdminReceiver extends DeviceAdminReceiver {
 
+    //Tag for debugging
     public final static String DEBUG_TAG = "AdminReceiver";
+
+    //Instances for camera object
     private Camera camera;
     private int cameraId = 0;
 
-
     @Override
     public void onEnabled(Context ctxt, Intent intent) {
-
-
+        Log.d(DEBUG_TAG, "onEnabled");
     }
 
     @Override
     public void onPasswordFailed(Context ctxt, Intent intent) {
-        Log.d("LockScreen", "onPasswordFailed");
+        Log.d(DEBUG_TAG, "onPasswordFailed");
+
         DevicePolicyManager mgr = (DevicePolicyManager) ctxt.getSystemService(Context.DEVICE_POLICY_SERVICE);
         int no = mgr.getCurrentFailedPasswordAttempts();
+
+        //check if password failed 3 times
         if (no >= 3) {
-            Log.d("LockScreen", "Failed 3 times");
-            //Toast does not show
-            //Toast.makeText(ctxt, R.string.password_failed, Toast.LENGTH_LONG).show();
-            //Intent alertIntent = new Intent(ctxt, SettingsActivity.class);
+            Log.d(DEBUG_TAG, "Failed 3 times");
+
             // do we have a camera?
             if (!ctxt.getPackageManager()
                     .hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
@@ -56,11 +55,13 @@ public class AdminReceiver extends DeviceAdminReceiver {
                 }
             }
 
+            //start camera and call handler
             camera.startPreview();
-            camera.takePicture(null, null,
-                    new PhotoHandler(ctxt.getApplicationContext()));
+            camera.takePicture(null, null, new PhotoAndEmailHandler(ctxt.getApplicationContext()));
+
+            //show Lockscreen Activity
             Intent alarmIntent = new Intent("android.intent.action.MAIN");
-            alarmIntent.setClass(ctxt, ToastActivity.class);
+            alarmIntent.setClass(ctxt, LockScreenActivity.class);
             alarmIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             alarmIntent.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
                     WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
@@ -72,10 +73,10 @@ public class AdminReceiver extends DeviceAdminReceiver {
 
     @Override
     public void onPasswordSucceeded(Context ctxt, Intent intent) {
-        Toast.makeText(ctxt, R.string.password_success, Toast.LENGTH_LONG)
-                .show();
+        //Toast.makeText(ctxt, R.string.password_success, Toast.LENGTH_LONG).show();
     }
 
+    //find front facing camera
     private int findFrontFacingCamera() {
         int cameraId = -1;
         // Search for the front facing camera

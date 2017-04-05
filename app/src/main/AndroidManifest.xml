@@ -52,7 +52,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ToastActivity" android:theme="@style/Theme.Transparent">
+        <activity android:name=".LockScreenActivity" android:theme="@style/Theme.Transparent">
             <uses-permission android:name="android.permission.WAKE_LOCK" />
             <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
         </activity>

@@ -3,6 +3,7 @@ package com.example.danielbedich.captcha;
 import java.security.AccessController;
 import java.security.Provider;
 
+//JavaMail API needed class, sed for authentication
 public class JSSEProvider extends Provider {
     public JSSEProvider() {
         super("HarmonyJSSE", 1.0, "Harmony JSSE Provider");

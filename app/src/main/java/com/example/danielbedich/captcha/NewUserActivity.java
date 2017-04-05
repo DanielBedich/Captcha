@@ -10,8 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+//Creates new user on first run of app
 public class NewUserActivity extends AppCompatActivity {
 
+    //Items in views
     private EditText mEmailText;
     private EditText mPasswordText;
     private EditText mPasswordConfirmText;
@@ -22,12 +24,12 @@ public class NewUserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_user);
 
+        //set view items
         mEmailText = (EditText) findViewById(R.id.emailText);
-
         mPasswordText = (EditText) findViewById(R.id.passwordText);
-
         mPasswordConfirmText = (EditText) findViewById(R.id.passwordConfirmText);
 
+        //on submit button click, save entered info if info is valid
         mSubmitButton = (Button) findViewById(R.id.submitButton);
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,9 +49,5 @@ public class NewUserActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
-
-
-
 }

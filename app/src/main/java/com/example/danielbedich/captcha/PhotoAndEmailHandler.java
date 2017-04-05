@@ -13,60 +13,57 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.example.danielbedich.captcha.AdminReceiver;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
-public class PhotoHandler implements PictureCallback  {
+public class PhotoAndEmailHandler implements PictureCallback  {
 
+    //context of the app, very important!
     private final Context context;
-    public PhotoHandler(Context context) {
+    public PhotoAndEmailHandler(Context context) {
         this.context = context;
     }
 
+    //Email variables
     GMailSender sender;
     private String senderEmail = "captchaosu@gmail.com";
     private String senderPassword = "captcha4471";
     private String userEmail;
 
-    SimpleDateFormat simpleDateFormat;
-    String format;
+    //Time variables
+    private SimpleDateFormat simpleDateFormat;
+    private String format;
 
+    //GPS variables
     private String mLat;
     private String mLong;
     private final String emailSubject = "CAPTCHA! ALERT: POTENTIAL INTRUDER DETECTED!";
 
-    String mCurrentPhotoPath;
-    private String ImagePath;
-    private Uri URI;
+    //Picture variables
     public File pictureFile;
 
-    private ImageView mImageView;
 
     @Override
     public void onPictureTaken(byte[] data, Camera camera) {
+        //set user email
         userEmail = getDefaultSharedPreferences(context).getString("EMAIL", "Error: no email");
 
+        //set directory of picture taken
         File pictureFileDir = getDir();
 
+        //Make sure directory was made
         if (!pictureFileDir.exists() && !pictureFileDir.mkdirs()) {
 
             Log.d(AdminReceiver.DEBUG_TAG, "Can't create directory to save image.");
@@ -76,20 +73,23 @@ public class PhotoHandler implements PictureCallback  {
 
         }
 
+        //set time of intrusion for image name format
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyymmddhhmmss");
         String date = dateFormat.format(new Date());
+
+        //name image file
         String photoFile = "Picture_" + date + ".jpg";
 
+        //Name image file with path of directory
         String filename = pictureFileDir.getPath() + File.separator + photoFile;
-        System.out.println("Filename" + filename);
+        //System.out.println("Filename" + filename);
 
+        //Create the image file
         pictureFile = new File(filename);
 
-        System.out.println(pictureFile.getAbsolutePath());
+        //System.out.println(pictureFile.getAbsolutePath());
 
-
-        //URI = Uri.parse(pictureFile.getAbsolutePath());
-
+        //Save image file...somewhere?
         try {
             FileOutputStream fos = new FileOutputStream(pictureFile);
             fos.write(data);
@@ -103,15 +103,24 @@ public class PhotoHandler implements PictureCallback  {
                     Toast.LENGTH_LONG).show();
         }
 
+        //save image file to device's gallery app
+        addImageToGallery(pictureFile.getAbsolutePath());
+
+        //set time of intrusion for email
         simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
         format = simpleDateFormat.format(new Date());
-        addImageToGallery(pictureFile.getAbsolutePath());
+
+        //get gps locations for email
         getGPSCoordinates();
+
+        //set instance of GMailSender to Captcha!'s email
         sender = new GMailSender(senderEmail, senderPassword);
 
+        //New thread?
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.
                 Builder().permitAll().build();
 
+        //Send email in background through AsyncClass
         StrictMode.setThreadPolicy(policy);
         try {
             new MyAsyncClass().execute();
@@ -121,11 +130,13 @@ public class PhotoHandler implements PictureCallback  {
 
     }
 
+    //Get directory where image will be saved
     private File getDir() {
         String storageDir = Environment.getExternalStorageDirectory() + "/" + Environment.DIRECTORY_DCIM + "/";
         return new File(storageDir, "Captcha!");
     }
 
+    //Saves image to device's gallery
     public void addImageToGallery(final String filePath) {
 
         ContentValues values = new ContentValues();
@@ -137,6 +148,7 @@ public class PhotoHandler implements PictureCallback  {
         context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
     }
 
+    //Class sends email in another thread
     class MyAsyncClass extends AsyncTask<Void, Void, Void> {
 
         ProgressDialog pDialog;
@@ -144,14 +156,11 @@ public class PhotoHandler implements PictureCallback  {
         @Override
         protected void onPreExecute() {
             try {
-                System.out.println("HEY Do try");
-                // Add subject, Body, your mail Id, and receiver mail Id.
+                // Add subject, body, Captcha! mail Id, user mail Id, and attachment.
                 sender.sendMailAttachment(emailSubject, getEmailBody(), senderEmail, userEmail, pictureFile);
             }
             catch (Exception ex) {
-                System.out.println("HEY Do catch");
             }
-            System.out.println("HEY Pre");
             super.onPreExecute();
             pDialog = new ProgressDialog(context);
             pDialog.setMessage("Please wait...");
@@ -161,25 +170,23 @@ public class PhotoHandler implements PictureCallback  {
         @Override
         protected Void doInBackground(Void... mApi) {
             try {
-                System.out.println("HEY Do try");
                 // Add subject, Body, your mail Id, and receiver mail Id.
-                sender.sendMail("Captcha Test", "Yay it works!", "captchaosu@gmail.com", "dbedich@yahoo.com");
+                //sender.sendMail("Captcha Test", "Yay it works!", "captchaosu@gmail.com", "dbedich@yahoo.com");
             }
             catch (Exception ex) {
-                System.out.println("HEY Do catch");
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            System.out.println("HEY Post");
             super.onPostExecute(result);
             pDialog.cancel();
-            Toast.makeText(context, "Email send", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Email send", Toast.LENGTH_SHORT).show();
         }
     }
 
+    //Sets gps variables
     public void getGPSCoordinates(){
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
@@ -198,6 +205,7 @@ public class PhotoHandler implements PictureCallback  {
         mLong = location.getLongitude() + "";
     }
 
+    //Creates body of email
     public String getEmailBody(){
         return "CAPTCHA! has detected a potential intruder!\n" +
                 "The time of intrusion was " + format + "\n" +

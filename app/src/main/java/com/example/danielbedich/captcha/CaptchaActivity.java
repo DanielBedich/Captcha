@@ -13,18 +13,22 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+//Main Activity that starts Captcha!
 public class CaptchaActivity extends AppCompatActivity {
 
+    //Tag for debugging
+    private String tag = "CaptchaActivity Log";
+
+    //Items in view
     private TextView mStatusTextView;
     private Button mStatusButton;
     private Button mSettingsButton;
-    private String tag;
 
-
+    //Creates DeviceAdminReceiver
     private void startLock(){
         ComponentName cn=new ComponentName(this, AdminReceiver.class);
-        DevicePolicyManager mgr=
-                (DevicePolicyManager)getSystemService(DEVICE_POLICY_SERVICE);
+        /*DevicePolicyManager mgr=
+                (DevicePolicyManager)getSystemService(DEVICE_POLICY_SERVICE);*/
 
         Intent intent=new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
         intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, cn);
@@ -33,6 +37,7 @@ public class CaptchaActivity extends AppCompatActivity {
 
     }
 
+    //Changes running status on button press
     private void changeRunningStatus(View v, Button b){
         Toast.makeText(this, R.string.statusToast, Toast.LENGTH_SHORT).show();
         if(mStatusButton.getText().equals(getString(R.string.statusStartButton))){
@@ -55,14 +60,18 @@ public class CaptchaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_captcha);
 
-        Boolean settingsFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
-                .getBoolean("statusFirstRun", true);
-
+        //Set view items
         mStatusTextView = (TextView) findViewById(R.id.statusText);
         mStatusButton = (Button) findViewById(R.id.changeStatusButton);
 
+        //get status first run of app
+        Boolean settingsFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+                .getBoolean("statusFirstRun", true);
+
+
+        //if status first run go to set default settings, else load last settings
         if (settingsFirstRun) {
-            Toast.makeText(this, "FIRST RUN", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "FIRST RUN", Toast.LENGTH_SHORT).show();
             mStatusTextView.setText(R.string.statusOff);
             mStatusButton.setText(R.string.statusStartButton);
             SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(CaptchaActivity.this);
@@ -71,17 +80,17 @@ public class CaptchaActivity extends AppCompatActivity {
             mEditor.putString("STATUS_BUTTON", mStatusButton.getText().toString());
             mEditor.commit();
         } else {
-            Toast.makeText(this, "NOT FIRST RUN", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "NOT FIRST RUN", Toast.LENGTH_SHORT).show();
             mStatusTextView.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("STATUS_TEXT", "fail"));
             mStatusButton.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("STATUS_BUTTON", "fail"));
         }
 
-
-
+        //Change status first run
         getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
                 .putBoolean("statusFirstRun", false).commit();
 
 
+        //On status button press, change running status
         mStatusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,6 +98,7 @@ public class CaptchaActivity extends AppCompatActivity {
             }
         });
 
+        //On settings button press, go to SettingsActivity
         mSettingsButton = (Button) findViewById(R.id.settingsButton);
         mSettingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,6 +109,7 @@ public class CaptchaActivity extends AppCompatActivity {
 
     }
 
+    //Android Activity Lifecycle Methods
     public void onStart()
     {
         super.onStart();

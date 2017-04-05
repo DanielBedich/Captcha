@@ -22,7 +22,7 @@ import java.security.Security;
 import java.util.Properties;
 
 
-
+//Allows for connecting, authenticating, and sending email through GMail
 public class GMailSender extends javax.mail.Authenticator {
 
     private String mailhost = "smtp.gmail.com";
@@ -61,6 +61,7 @@ public class GMailSender extends javax.mail.Authenticator {
         return new PasswordAuthentication(user, password);
     }
 
+    //Send email without an attachment
     public synchronized void sendMail(String subject, String body,
                                       String sender, String recipients) throws Exception {
         MimeMessage message = new MimeMessage(session);
@@ -79,6 +80,7 @@ public class GMailSender extends javax.mail.Authenticator {
         Transport.send(message);
     }
 
+    //Sends email with attachment
     public void sendMailAttachment(String subject, String body, String sender, String recipients, File attachment) {
         try{
             MimeMessage message = new MimeMessage(session);

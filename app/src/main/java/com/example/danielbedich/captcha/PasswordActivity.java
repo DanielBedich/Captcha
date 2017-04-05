@@ -9,8 +9,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+//Password Activity that onload of app
 public class PasswordActivity extends AppCompatActivity {
 
+    //Items in view
     private EditText mPasswordText;
     private Button mSubmitButton;
 
@@ -19,23 +21,29 @@ public class PasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_password);
 
+        //get status of password first run
         Boolean passwordFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
                 .getBoolean("passwordFirstRun", true);
 
+        //if first run of password activity, start NewUserActivity
         if(passwordFirstRun){
             startActivity(new Intent(PasswordActivity.this, NewUserActivity.class));
             Toast.makeText(PasswordActivity.this, "New user", Toast.LENGTH_LONG)
                     .show();
         }
 
+        //change status of password first run
         getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
                 .putBoolean("passwordFirstRun", false).commit();
 
+        //Password saved in shared preferences
         final String password = PreferenceManager.getDefaultSharedPreferences(PasswordActivity.this).getString("PASSWORD", "Error: no password");
 
+        //set view items
         mPasswordText = (EditText) findViewById(R.id.passwordText);
-
         mSubmitButton = (Button) findViewById(R.id.submitButton);
+
+        //on submit button click, check if password is coorect, if so start CaptchaActivity
         mSubmitButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -52,6 +60,7 @@ public class PasswordActivity extends AppCompatActivity {
 
     }
 
+    //helper method to check of entered password is correct
     public boolean checkPassword(String enteredPassword, String actualPassword){
         boolean b;
         if(enteredPassword.equals(actualPassword)){

@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Captcha</string>
-    <string name="statusOff">Captcha is not currently running.</string>
-    <string name="statusOn">Captcha is currently running.</string>
-    <string name="statusStartButton">Start Captcha</string>
-    <string name="statusStopButton">Stop Captcha</string>
+    <string name="app_name">Captcha!</string>
+    <string name="statusOff">Captcha! is not currently running</string>
+    <string name="statusOn">Captcha! is currently running</string>
+    <string name="statusStartButton">Start Captcha!</string>
+    <string name="statusStopButton">Stop Captcha!</string>
     <string name="settingsButton">Settings</string>
     <string name="statusToast">Running Status Changed</string>
     <string name="email">Email</string>
@@ -12,12 +12,8 @@
     <string name="oldPassword">Current Password</string>
     <string name="newPassword">Change Password</string>
     <string name="submit">Submit</string>
-    <string name="toast">WRONG!</string>
     <string name="alert">YOU HAVE BEEN CAUGHT BY CAPTCHA!</string>
 
     <string name="device_admin_explanation">For experimentation purposes only</string>
-    <string name="compliant">Your password is compliant!</string>
-    <string name="not_compliant">Your password is not compliant! Submit to my authority!</string>
-    <string name="password_failed">You will never break into this device!</string>
     <string name="password_success">Congratulations!</string>
 </resources>

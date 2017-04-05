@@ -10,8 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+//Holds settings of user and allows to change them
 public class SettingsActivity extends AppCompatActivity {
 
+    //Items in view
     private EditText mEmailText;
     private EditText mPasswordText;
     private EditText mNewPasswordText;
@@ -23,16 +25,15 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        //set view items, some through preference manager
         mEmailText = (EditText) findViewById(R.id.emailText);
         mEmailText.setText(PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this).getString("EMAIL", "Error: no email"));
-
         mPasswordText = (EditText) findViewById(R.id.oldPasswordText);
         final String password = PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this).getString("PASSWORD", "Error: no password");
-
         mNewPasswordText = (EditText) findViewById(R.id.newPasswordText);
-
         mConfirmNewPasswordText = (EditText) findViewById(R.id.newPasswordConfirmText);
 
+        //On submit button press, save info if info is valid
         mSubmitButton = (Button) findViewById(R.id.submitButton);
         mSubmitButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -41,15 +42,12 @@ public class SettingsActivity extends AppCompatActivity {
                 SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this);
                 SharedPreferences.Editor mEditor = mPrefs.edit();
 
-
                 //Check for new password
                 if(mNewPasswordText.getText().length()>0){
                     String enteredPassword = mPasswordText.getText().toString();
-
                     //Check if old password is correct
                     if(checkPassword(enteredPassword, password)){
                         //Toast.makeText(SettingsActivity.this, "Old Password Correct", Toast.LENGTH_SHORT).show();
-
                         //Check if new password is correct
                         if(mNewPasswordText.getText().toString().equals(mConfirmNewPasswordText.getText().toString())){
                             mEditor = mPrefs.edit();
@@ -80,6 +78,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     }
 
+    //helper method to check of entered password is correct
     public boolean checkPassword(String enteredPassword, String actualPassword){
         boolean b;
         if(enteredPassword.equals(actualPassword)){
