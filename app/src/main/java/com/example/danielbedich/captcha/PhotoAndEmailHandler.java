@@ -207,10 +207,11 @@ public class PhotoAndEmailHandler implements PictureCallback  {
 
     //Creates body of email
     public String getEmailBody(){
+        //http://maps.google.com/maps?q=description+(name)+%4046.090271,6.657248
         return "CAPTCHA! has detected a potential intruder!\n" +
                 "The time of intrusion was " + format + "\n" +
                 "View their location at the following link:\n" +
-                "https://www.google.com/maps/@"+mLat+","+mLong+",13z\n" +
+                "http://maps.google.com/maps?z=18&q="+mLat+","+mLong+"\n" +
                 "View the attached image for who CAPTCHA! caught!";
     }
 }
