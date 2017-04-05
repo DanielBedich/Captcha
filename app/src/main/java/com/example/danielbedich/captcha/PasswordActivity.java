@@ -33,8 +33,7 @@ public class PasswordActivity extends AppCompatActivity {
         }
 
         //change status of password first run
-        getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
-                .putBoolean("passwordFirstRun", false).commit();
+
 
         //Password saved in shared preferences
         final String password = PreferenceManager.getDefaultSharedPreferences(PasswordActivity.this).getString("PASSWORD", "Error: no password");

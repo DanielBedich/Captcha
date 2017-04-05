@@ -39,6 +39,8 @@ public class NewUserActivity extends AppCompatActivity {
                     SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.putString("PASSWORD", mPasswordText.getText().toString());
                     mEditor.putString("EMAIL", mEmailText.getText().toString());
+                    getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+                            .putBoolean("passwordFirstRun", false).commit();
                     mEditor.commit();
                     Toast.makeText(NewUserActivity.this, "Password Accepted", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(NewUserActivity.this, CaptchaActivity.class));

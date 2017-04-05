@@ -24,6 +24,7 @@ public class CaptchaActivity extends AppCompatActivity {
     private Button mStatusButton;
     private Button mSettingsButton;
 
+
     //Creates DeviceAdminReceiver
     private void startLock(){
         ComponentName cn=new ComponentName(this, AdminReceiver.class);
@@ -39,17 +40,19 @@ public class CaptchaActivity extends AppCompatActivity {
 
     //Changes running status on button press
     private void changeRunningStatus(View v, Button b){
+        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(CaptchaActivity.this);
+        SharedPreferences.Editor mEditor = mPrefs.edit();
         Toast.makeText(this, R.string.statusToast, Toast.LENGTH_SHORT).show();
         if(mStatusButton.getText().equals(getString(R.string.statusStartButton))){
             mStatusButton.setText(R.string.statusStopButton);
             mStatusTextView.setText(R.string.statusOn);
+            mEditor.putBoolean("RUNNING_STATUS", true);
             startLock();
         } else {
+            mEditor.putBoolean("RUNNING_STATUS", false);
             mStatusButton.setText(R.string.statusStartButton);
             mStatusTextView.setText(R.string.statusOff);
         }
-        SharedPreferences mPrefs = PreferenceManager.getDefaultSharedPreferences(CaptchaActivity.this);
-        SharedPreferences.Editor mEditor = mPrefs.edit();
         mEditor.putString("STATUS_TEXT", mStatusTextView.getText().toString());
         mEditor.putString("STATUS_BUTTON", mStatusButton.getText().toString());
         mEditor.commit();
@@ -59,6 +62,7 @@ public class CaptchaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_captcha);
+
 
         //Set view items
         mStatusTextView = (TextView) findViewById(R.id.statusText);
@@ -78,6 +82,7 @@ public class CaptchaActivity extends AppCompatActivity {
             SharedPreferences.Editor mEditor = mPrefs.edit();
             mEditor.putString("STATUS_TEXT", mStatusTextView.getText().toString());
             mEditor.putString("STATUS_BUTTON", mStatusButton.getText().toString());
+            mEditor.putBoolean("RUNNING_STATUS", false);
             mEditor.commit();
         } else {
             //Toast.makeText(this, "NOT FIRST RUN", Toast.LENGTH_SHORT).show();

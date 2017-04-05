@@ -16,9 +16,11 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
@@ -28,7 +30,7 @@ import android.widget.Toast;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
-public class PhotoAndEmailHandler implements PictureCallback  {
+public class PhotoAndEmailHandler implements PictureCallback, LocationListener {
 
     //context of the app, very important!
     private final Context context;
@@ -41,6 +43,8 @@ public class PhotoAndEmailHandler implements PictureCallback  {
     private String senderEmail = "captchaosu@gmail.com";
     private String senderPassword = "captcha4471";
     private String userEmail;
+    private final String emailSubject = "CAPTCHA! ALERT: POTENTIAL INTRUDER DETECTED!";
+
 
     //Time variables
     private SimpleDateFormat simpleDateFormat;
@@ -49,7 +53,6 @@ public class PhotoAndEmailHandler implements PictureCallback  {
     //GPS variables
     private String mLat;
     private String mLong;
-    private final String emailSubject = "CAPTCHA! ALERT: POTENTIAL INTRUDER DETECTED!";
 
     //Picture variables
     public File pictureFile;
@@ -148,6 +151,26 @@ public class PhotoAndEmailHandler implements PictureCallback  {
         context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
     //Class sends email in another thread
     class MyAsyncClass extends AsyncTask<Void, Void, Void> {
 
@@ -189,7 +212,7 @@ public class PhotoAndEmailHandler implements PictureCallback  {
     //Sets gps variables
     public void getGPSCoordinates(){
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions

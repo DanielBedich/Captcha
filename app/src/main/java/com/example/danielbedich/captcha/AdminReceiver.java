@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -31,6 +32,8 @@ public class AdminReceiver extends DeviceAdminReceiver {
 
     @Override
     public void onPasswordFailed(Context ctxt, Intent intent) {
+        if(!PreferenceManager.getDefaultSharedPreferences(ctxt).getBoolean("RUNNING_STATUS", false)){ return;}
+
         Log.d(DEBUG_TAG, "onPasswordFailed");
 
         DevicePolicyManager mgr = (DevicePolicyManager) ctxt.getSystemService(Context.DEVICE_POLICY_SERVICE);
