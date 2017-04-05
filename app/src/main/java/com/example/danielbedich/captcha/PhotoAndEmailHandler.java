@@ -28,6 +28,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import static android.content.Context.LOCATION_SERVICE;
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class PhotoAndEmailHandler implements PictureCallback, LocationListener {
@@ -51,8 +52,15 @@ public class PhotoAndEmailHandler implements PictureCallback, LocationListener {
     private String format;
 
     //GPS variables
-    private String mLat;
-    private String mLong;
+    boolean checkGPS = false;
+    boolean checkNetwork = false;
+    boolean canGetLocation = false;
+    Location loc;
+    double latitude;
+    double longitude;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+    protected LocationManager locationManager;
 
     //Picture variables
     public File pictureFile;
@@ -211,21 +219,75 @@ public class PhotoAndEmailHandler implements PictureCallback, LocationListener {
 
     //Sets gps variables
     public void getGPSCoordinates(){
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        try {
+            locationManager = (LocationManager) context
+                    .getSystemService(LOCATION_SERVICE);
+
+            // getting GPS status
+            checkGPS = locationManager
+                    .isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+            // getting network status
+            checkNetwork = locationManager
+                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+            if (!checkGPS && !checkNetwork) {
+                Toast.makeText(context, "No Service Provider Available", Toast.LENGTH_SHORT).show();
+            } else {
+                this.canGetLocation = true;
+                // First get location from Network Provider
+                if (checkNetwork) {
+                    Toast.makeText(context, "Network", Toast.LENGTH_SHORT).show();
+
+                    try {
+                        locationManager.requestLocationUpdates(
+                                LocationManager.NETWORK_PROVIDER,
+                                MIN_TIME_BW_UPDATES,
+                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        Log.d("Network", "Network");
+                        if (locationManager != null) {
+                            loc = locationManager
+                                    .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+                        }
+
+                        if (loc != null) {
+                            latitude = loc.getLatitude();
+                            longitude = loc.getLongitude();
+                        }
+                    }
+                    catch(SecurityException e){
+
+                    }
+                }
+            }
+            // if GPS Enabled get lat/long using GPS Services
+            if (checkGPS) {
+                Toast.makeText(context,"GPS",Toast.LENGTH_SHORT).show();
+                if (loc == null) {
+                    try {
+                        locationManager.requestLocationUpdates(
+                                LocationManager.GPS_PROVIDER,
+                                MIN_TIME_BW_UPDATES,
+                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        Log.d("GPS Enabled", "GPS Enabled");
+                        if (locationManager != null) {
+                            loc = locationManager
+                                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            if (loc != null) {
+                                latitude = loc.getLatitude();
+                                longitude = loc.getLongitude();
+                            }
+                        }
+                    } catch (SecurityException e) {
+
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        final Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        mLat = location.getLatitude() + "";
-        mLong = location.getLongitude() + "";
     }
 
     //Creates body of email
@@ -234,7 +296,7 @@ public class PhotoAndEmailHandler implements PictureCallback, LocationListener {
         return "CAPTCHA! has detected a potential intruder!\n" +
                 "The time of intrusion was " + format + "\n" +
                 "View their location at the following link:\n" +
-                "http://maps.google.com/maps?z=18&q="+mLat+","+mLong+"\n" +
+                "http://maps.google.com/maps?z=18&q="+latitude+","+longitude+"\n" +
                 "View the attached image for who CAPTCHA! caught!";
     }
 }
